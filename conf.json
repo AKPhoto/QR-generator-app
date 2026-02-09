@@ -1,0 +1,8 @@
+{
+  "supabase": {
+    "url": "",
+    "anonKey": "",
+    "tableName": "members",
+    "bucketName": "member-photos"
+  }
+}

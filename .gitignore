@@ -1,5 +1,6 @@
 # Ignore Supabase configuration file (contains sensitive credentials)
-conf.json
+# conf.json - COMMENTED OUT: Need this file deployed to Netlify for production
+# Note: Supabase anon key is safe to expose publicly (it has Row Level Security)
 
 # OS files
 .DS_Store
