@@ -1,7 +1,7 @@
 {
   "supabase": {
-    "url": "",
-    "anonKey": "",
+    "url": "https://mfacciikxrmnqudqzukj.supabase.co",
+    "anonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mYWNjaWlreHJtbnF1ZHF6dWtqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIwOTk4OTIsImV4cCI6MjA3NzY3NTg5Mn0.Qv6g8Lg_wiMt69cGEDwTo852r_aWl_Mz3SbiLwvo2Fg",
     "tableName": "members",
     "bucketName": "member-photos"
   }
