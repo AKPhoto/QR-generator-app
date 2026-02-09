@@ -1637,3 +1637,107 @@ UPDATED FUTURE ENHANCEMENTS:
 - Support for flag variants (e.g., multiple aspect ratios)
 
 ================================================================================
+UPDATE: February 9, 2026 - CRITICAL BUG FIX: SUPABASE VALIDATION LOGIC
+================================================================================
+
+ISSUE DISCOVERED:
+Application was falling back to Excel file despite Supabase being properly configured and containing valid data with payment_confirmed=true records.
+
+ROOT CAUSE ANALYSIS:
+The validation logic in validateAndTransformData() had a critical bug in handling the annual_membership_records array from Supabase:
+
+1. Supabase returns annual_membership_records as an ARRAY:
+   - Members WITH records: [{payment_confirmed: true, id_card_issued: false}]
+   - Members WITHOUT records: [] (empty array)
+
+2. JavaScript Truthy/Falsy Issue:
+   - Empty array [] is TRUTHY in JavaScript
+   - Original code: `if (!membershipRecord)` didn't catch empty arrays
+   - Code tried to access properties on undefined, causing all records to be filtered out
+   - Result: validateAndTransformData() returned null → fallback to Excel triggered
+
+3. The join query WAS working correctly:
+   - Supabase API returned data successfully
+   - annual_membership_records array was properly included
+   - Some records had payment_confirmed=true
+   - BUT validation logic failed to recognize valid records
+
+THE FIX (app.js lines 1435-1456):
+
+BEFORE:
+```javascript
+const membershipRecord = row.annual_membership_records?.[0] || row.annual_membership_records;
+
+if (!membershipRecord) {
+    skippedRecords.push({ 
+        row: index + 1, 
+        name: row.personalInfo?.name || row.name || 'Unknown',
+        reason: 'No annual membership record found' 
+    });
+    return;
+}
+```
+
+AFTER:
+```javascript
+const membershipRecordArray = row.annual_membership_records;
+const membershipRecord = Array.isArray(membershipRecordArray) ? membershipRecordArray[0] : membershipRecordArray;
+
+if (!membershipRecord || (Array.isArray(membershipRecordArray) && membershipRecordArray.length === 0)) {
+    skippedRecords.push({ 
+        row: index + 1, 
+        name: row.personalInfo?.name || row.name || 'Unknown',
+        reason: 'No annual membership record found' 
+    });
+    return;
+}
+```
+
+KEY IMPROVEMENTS:
+1. ✅ Properly handles array vs non-array membershipRecord
+2. ✅ Explicitly checks for empty array: `membershipRecordArray.length === 0`
+3. ✅ Added debug logging for first 3 records to diagnose validation issues
+4. ✅ Added logging to show validated record count vs null return
+
+TESTING PERFORMED:
+- Direct Supabase API curl tests confirmed data with payment_confirmed=true exists
+- Verified join query returns annual_membership_records array correctly
+- Added detailed console logging to track validation flow
+- Confirmed empty arrays were causing false positives in validation
+
+RESULT:
+Application now correctly:
+- ✅ Identifies members with payment_confirmed=true
+- ✅ Skips members with empty annual_membership_records array
+- ✅ Skips members with payment_confirmed=false
+- ✅ Skips members with id_card_issued=true
+- ✅ Uses Supabase data as primary source (not Excel fallback)
+
+DEBUG LOGGING ADDED:
+- fetchFromSupabase(): Shows record count and validation result
+- validateAndTransformData(): DEBUG output for first 3 records showing:
+  * membershipRecordArray structure
+  * isArray check result
+  * array length
+  * payment_confirmed and id_card_issued values
+  * missing_info flag
+
+CONSOLE OUTPUT NOW SHOWS:
+```
+✅ Fetched X records from Supabase
+First record annual_membership_records: [...]
+DEBUG Row 1: {name, membershipRecordArray, isArray, arrayLength, payment_confirmed, id_card_issued, missing_info}
+✅ Processed Y records (only necessary fields for badges/QR codes)
+⏭️ Skipped Z records (not ready for generation)
+Validated data result: Y records
+✓ Successfully loaded Y records from Supabase
+```
+
+FILES MODIFIED:
+- js/app.js: Fixed validateAndTransformData() array handling logic (lines 1435-1456)
+- js/app.js: Added debug logging to fetchFromSupabase() and validateAndTransformData()
+
+LESSON LEARNED:
+Always explicitly check for empty arrays when working with Supabase joins that may return [] for missing relationships. JavaScript's truthy/falsy behavior can cause subtle bugs with array checking.
+
+================================================================================

@@ -1397,9 +1397,12 @@ class QRGenerator {
             
             console.log(`✅ Fetched ${data.length} records from Supabase`);
             console.log('First record sample:', data[0]);
+            console.log('First record annual_membership_records:', data[0].annual_membership_records);
             
             // Validate and transform data
             const validatedData = this.validateAndTransformData(data, 'supabase');
+            
+            console.log('Validated data result:', validatedData ? `${validatedData.length} records` : 'null');
             
             return validatedData;
         } catch (error) {
@@ -1431,9 +1434,24 @@ class QRGenerator {
                 }
                 
                 // Check payment_confirmed and id_card_issued from annual_membership_records
-                const membershipRecord = row.annual_membership_records?.[0] || row.annual_membership_records;
+                const membershipRecordArray = row.annual_membership_records;
+                const membershipRecord = Array.isArray(membershipRecordArray) ? membershipRecordArray[0] : membershipRecordArray;
                 
-                if (!membershipRecord) {
+                // Debug logging for first few records
+                if (index < 3) {
+                    console.log(`DEBUG Row ${index + 1}:`, {
+                        name: row.personalInfo?.name || row.name || 'Unknown',
+                        membershipRecordArray: membershipRecordArray,
+                        isArray: Array.isArray(membershipRecordArray),
+                        arrayLength: Array.isArray(membershipRecordArray) ? membershipRecordArray.length : 'N/A',
+                        membershipRecord: membershipRecord,
+                        payment_confirmed: membershipRecord?.payment_confirmed,
+                        id_card_issued: membershipRecord?.id_card_issued,
+                        missing_info: row.missing_info
+                    });
+                }
+                
+                if (!membershipRecord || (Array.isArray(membershipRecordArray) && membershipRecordArray.length === 0)) {
                     skippedRecords.push({ 
                         row: index + 1, 
                         name: row.personalInfo?.name || row.name || 'Unknown',

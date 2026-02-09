@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Supabase Connection Test</title>
+</head>
+<body>
+    <h1>Supabase Connection Test</h1>
+    <div id="output"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const output = document.getElementById('output');
+        
+        async function testConnection() {
+            try {
+                output.innerHTML += '<p>Loading conf.json...</p>';
+                const response = await fetch('conf.json');
+                const config = await response.json();
+                
+                output.innerHTML += '<p>Config loaded: ' + JSON.stringify(config) + '</p>';
+                
+                const supabaseConfig = config.supabase;
+                if (!supabaseConfig || !supabaseConfig.url || !supabaseConfig.anonKey) {
+                    output.innerHTML += '<p style="color: red;">❌ Supabase not configured in conf.json</p>';
+                    return;
+                }
+                
+                output.innerHTML += '<p>✅ Supabase configured</p>';
+                output.innerHTML += '<p>URL: ' + supabaseConfig.url + '</p>';
+                output.innerHTML += '<p>Table: ' + (supabaseConfig.tableName || 'members') + '</p>';
+                
+                const client = supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey);
+                output.innerHTML += '<p>✅ Supabase client created</p>';
+                
+                output.innerHTML += '<p>Fetching data from table: ' + (supabaseConfig.tableName || 'members') + '...</p>';
+                
+                const { data, error } = await client
+                    .from(supabaseConfig.tableName || 'members')
+                    .select(`
+                        *,
+                        annual_membership_records (
+                            payment_confirmed,
+                            id_card_issued
+                        )
+                    `);
+                
+                if (error) {
+                    output.innerHTML += '<p style="color: red;">❌ Error: ' + JSON.stringify(error) + '</p>';
+                    return;
+                }
+                
+                output.innerHTML += '<p style="color: green;">✅ Successfully fetched ' + (data ? data.length : 0) + ' records</p>';
+                
+                if (data && data.length > 0) {
+                    output.innerHTML += '<p>First record sample:</p>';
+                    output.innerHTML += '<pre>' + JSON.stringify(data[0], null, 2) + '</pre>';
+                    
+                    // Now test the validation logic
+                    output.innerHTML += '<hr><h2>Testing Validation Logic</h2>';
+                    
+                    let validCount = 0;
+                    let skippedCount = 0;
+                    
+                    data.forEach((row, index) => {
+                        const membershipRecordArray = row.annual_membership_records;
+                        const membershipRecord = Array.isArray(membershipRecordArray) ? membershipRecordArray[0] : membershipRecordArray;
+                        
+                        let skipReason = null;
+                        
+                        if (row.missing_info === true) {
+                            skipReason = 'missing_info = true';
+                        } else if (!membershipRecord || (Array.isArray(membershipRecordArray) && membershipRecordArray.length === 0)) {
+                            skipReason = 'No annual membership record';
+                        } else if (membershipRecord.payment_confirmed !== true) {
+                            skipReason = 'payment_confirmed not true';
+                        } else if (membershipRecord.id_card_issued === true) {
+                            skipReason = 'id_card already issued';
+                        }
+                        
+                        if (skipReason) {
+                            skippedCount++;
+                            if (skippedCount <= 5) {
+                                output.innerHTML += '<p style="color: orange;">⏭️ ' + (row.personalInfo?.name || 'Unknown') + ' - ' + skipReason + '</p>';
+                            }
+                        } else {
+                            validCount++;
+                            if (validCount <= 5) {
+                                output.innerHTML += '<p style="color: green;">✅ ' + (row.personalInfo?.name || 'Unknown') + ' - VALID</p>';
+                            }
+                        }
+                    });
+                    
+                    output.innerHTML += '<hr>';
+                    output.innerHTML += '<p><strong>Total Valid Records:</strong> ' + validCount + '</p>';
+                    output.innerHTML += '<p><strong>Total Skipped Records:</strong> ' + skippedCount + '</p>';
+                    
+                    if (validCount === 0) {
+                        output.innerHTML += '<p style="color: red; font-weight: bold;">❌ NO VALID RECORDS - Will fallback to Excel!</p>';
+                    } else {
+                        output.innerHTML += '<p style="color: green; font-weight: bold;">✅ SHOULD USE SUPABASE DATA</p>';
+                    }
+                }
+                
+            } catch (error) {
+                output.innerHTML += '<p style="color: red;">❌ Exception: ' + error.message + '</p>';
+                output.innerHTML += '<pre>' + error.stack + '</pre>';
+            }
+        }
+        
+        testConnection();
+    </script>
+</body>
+</html>
