@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Name Reading</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <h1>Test Name Field</h1>
+    <div id="output"></div>
+    
+    <script>
+        async function testNameReading() {
+            const response = await fetch('assets/EMS_Data.xlsx');
+            const arrayBuffer = await response.arrayBuffer();
+            const data = new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+            
+            const output = document.getElementById('output');
+            output.innerHTML = '<h2>First 3 rows Name field:</h2>';
+            
+            jsonData.slice(0, 3).forEach((row, i) => {
+                const nameValue = row['Name'] || '';
+                output.innerHTML += `<p>Row ${i}: Name = "${nameValue}" (length: ${nameValue.length})</p>`;
+                output.innerHTML += `<p>All keys: ${JSON.stringify(Object.keys(row))}</p><hr>`;
+            });
+        }
+        
+        testNameReading();
+    </script>
+</body>
+</html>

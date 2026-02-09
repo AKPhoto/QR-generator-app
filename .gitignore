@@ -1,0 +1,27 @@
+# Ignore Supabase configuration file (contains sensitive credentials)
+conf.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Log files
+*.log
+
+# Temporary files
+tmp/
+temp/
+
+# Build outputs
+dist/
+build/
+
+# Dependencies
+node_modules/

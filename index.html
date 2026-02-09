@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator - Badge & Disc Creator</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>QR Code Generator</h1>
+            <p>Create badges and discs with QR codes</p>
+            <button id="settingsBtn" class="btn-settings">⚙️ Settings</button>
+        </header>
+
+        <!-- Mode Selection -->
+        <div class="mode-selection">
+            <button id="individualBtn" class="mode-btn active">
+                <span class="icon">📄</span>
+                Individual Creation
+            </button>
+            <button id="bulkBtn" class="mode-btn">
+                <span class="icon">📚</span>
+                Bulk Creation
+            </button>
+        </div>
+
+        <!-- Individual Mode -->
+        <div id="individualMode" class="mode-panel active">
+            <h2>Individual Badge & Disc Creation</h2>
+            
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="individualType">Output Type:</label>
+                    <select id="individualType" class="form-control">
+                        <option value="both">Badge & Disc</option>
+                        <option value="badge">Badge Only</option>
+                        <option value="disc">Disc Only</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="individualFileFormat">File Format:</label>
+                    <select id="individualFileFormat" class="form-control">
+                        <option value="pdf">PDF</option>
+                        <option value="docx">DOCX (Word Document)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="photoUpload">Upload Photo:</label>
+                    <input type="file" id="photoUpload" class="form-control" accept="image/*">
+                    <small class="help-text">Photo will be resized to fit badge template</small>
+                </div>
+
+                <h3 class="section-title">Personal Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="idNumber">ID Number: <span class="required">*</span></label>
+                        <input type="text" id="idNumber" class="form-control" placeholder="Enter ID number" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Full Name: <span class="required">*</span></label>
+                        <input type="text" id="name" class="form-control" placeholder="Enter full name (first and last)" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactNumber">Contact Number: <span class="required">*</span></label>
+                        <input type="tel" id="contactNumber" class="form-control" placeholder="Enter contact number" required>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Emergency Contact Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="iceContactName">ICE Contact Name: <span class="required">*</span></label>
+                        <input type="text" id="iceContactName" class="form-control" placeholder="In Case of Emergency contact name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="iceContactNumber">ICE Contact Number: <span class="required">*</span></label>
+                        <input type="tel" id="iceContactNumber" class="form-control" placeholder="Emergency contact number" required>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Medical Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="medicalAidName">Medical Aid Name:</label>
+                        <input type="text" id="medicalAidName" class="form-control" placeholder="Enter medical aid name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medicalAidNumber">Medical Aid Number:</label>
+                        <input type="text" id="medicalAidNumber" class="form-control" placeholder="Enter medical aid number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medicalAidPlan">Medical Aid Plan:</label>
+                        <input type="text" id="medicalAidPlan" class="form-control" placeholder="Enter medical aid plan">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="allergies">Allergies:</label>
+                        <input type="text" id="allergies" class="form-control" placeholder="Enter allergies (if any)">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="medicalConditions">Medical Conditions:</label>
+                        <input type="text" id="medicalConditions" class="form-control" placeholder="Enter medical conditions (if any)">
+                    </div>
+                </div>
+
+                <h3 class="section-title">Work Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startingDate">Starting Date: <span class="required">*</span></label>
+                        <input type="date" id="startingDate" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="membershipNumber">Membership Number: <span class="required">*</span></label>
+                        <input type="text" id="membershipNumber" class="form-control" placeholder="Enter membership number" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="position">Position: <span class="required">*</span></label>
+                        <input type="text" id="position" class="form-control" placeholder="Enter position" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rank">Rank:</label>
+                        <input type="text" id="rank" class="form-control" placeholder="Enter rank">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country">Country: <span class="required">*</span></label>
+                        <select id="country" class="form-control" required>
+                            <option value="">Select country...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Vehicle Information</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="vehicleMake">Vehicle Make:</label>
+                        <input type="text" id="vehicleMake" class="form-control" placeholder="Enter vehicle make">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleModel">Vehicle Model:</label>
+                        <input type="text" id="vehicleModel" class="form-control" placeholder="Enter vehicle model">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleColor">Vehicle Color:</label>
+                        <input type="text" id="vehicleColor" class="form-control" placeholder="Enter vehicle color">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="vehicleRegistration">Vehicle Registration:</label>
+                        <input type="text" id="vehicleRegistration" class="form-control" placeholder="Enter vehicle registration">
+                    </div>
+                </div>
+
+                <button id="generateIndividualBtn" class="btn btn-primary">
+                    Generate
+                </button>
+            </div>
+
+            <div id="individualPreview" class="preview-section" style="display: none;">
+                <h3>Preview</h3>
+                <div class="preview-grid">
+                    <div id="badgePreview" class="preview-item"></div>
+                    <div id="discPreview" class="preview-item"></div>
+                </div>
+                <div class="button-group">
+                    <button id="downloadBadgeBtn" class="btn btn-secondary">Download Badge</button>
+                    <button id="downloadDiscBtn" class="btn btn-secondary">Download Disc</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Mode -->
+        <div id="bulkMode" class="mode-panel">
+            <h2>Bulk Badge & Disc Creation</h2>
+            
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="bulkType">Output Type:</label>
+                    <select id="bulkType" class="form-control">
+                        <option value="both">Badge & Disc</option>
+                        <option value="badge">Badge Only</option>
+                        <option value="disc">Disc Only</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bulkFileFormat">File Format:</label>
+                    <select id="bulkFileFormat" class="form-control">
+                        <option value="pdf">PDF</option>
+                        <option value="docx">DOCX (Word Document)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Data Source:</label>
+                    <div id="xlsxStatus" class="xlsx-status">
+                        <p>Data source: <strong id="dataSourceType">Not loaded</strong></p>
+                        <p id="xlsxLoadStatus" class="load-status">Ready to load...</p>
+                    </div>
+                    <small class="help-text">Data will be loaded from Supabase if configured, otherwise from local EMS_Data.xlsx file.<br>
+                    idNumber, name, surname, contactNumber, iceContactName, iceContactNumber, medicalAidName, medicalAidNumber, medicalAidPlan, allergies, medicalConditions, startingDate, membershipNumber, position, rank, vehicleMake, vehicleModel, vehicleColor, vehicleRegistration<br>
+                    <strong>Mobile users:</strong> Bulk generation works best on desktop. Use Individual mode for mobile.</small>
+                    <button id="reloadXlsxBtn" class="btn btn-secondary" style="margin-top: 10px;">🔄 Reload Data</button>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">💡 After configuring Supabase in Settings, click "Reload Data" to fetch from API</p>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="usePhotosCheckbox" style="margin-right: 8px;">
+                        Use Photos from Folder (Optional)
+                    </label>
+                    <div id="photoFolderSection" style="display: none; margin-top: 10px;">
+                        <label for="photoFolderUpload">Select Photo Folder:</label>
+                        <input type="file" id="photoFolderUpload" class="form-control" webkitdirectory directory multiple>
+                        <small class="help-text">
+                            Photos will be matched by ID number (e.g., "123456.jpg" matches ID number "123456" in the spreadsheet).<br>
+                            Photos will be resized and placed into PB1 and PB2 placeholders in the templates.<br>
+                            <strong>Note:</strong> When using Supabase, photos are automatically fetched from Storage and this option is not needed.
+                        </small>
+                        <div id="photoFolderStatus" style="margin-top: 10px; display: none;">
+                            <p><strong>Photos loaded:</strong> <span id="photoCount">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="generateBulkBtn" class="btn btn-primary">
+                    Generate Bulk QR Codes
+                </button>
+            </div>
+
+            <div id="bulkProgress" class="progress-section" style="display: none;">
+                <h3>Progress</h3>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+                <p id="progressText">Processing: 0 / 0</p>
+            </div>
+
+            <div id="bulkPreview" class="preview-section" style="display: none;">
+                <h3>Generated Items (<span id="itemCount">0</span>)</h3>
+                <div id="bulkPreviewGrid" class="bulk-preview-grid"></div>
+                <div class="button-group">
+                    <button id="downloadAllBtn" class="btn btn-primary">Download All as ZIP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Country & Flag Settings</h2>
+                <button id="closeSettings" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Configure which flag SVG file should be used for each country name.</p>
+                <p class="help-text">Place your flag SVG files in the <code>assets/Flags/</code> folder and enter the filename below.</p>
+                
+                <div class="settings-section">
+                    <h3>Add New Mapping</h3>
+                    <div class="form-group">
+                        <label for="countryName">Country Name:</label>
+                        <input type="text" id="countryName" class="form-control" placeholder="e.g., South Africa">
+                    </div>
+                    <div class="form-group">
+                        <label for="flagFilename">Flag SVG Filename:</label>
+                        <div class="input-with-button">
+                            <input type="text" id="flagFilename" class="form-control" placeholder="e.g., flag_sa.svg" readonly>
+                            <input type="file" id="flagFileInput" accept=".svg" style="display: none;">
+                            <button id="browseFlagBtn" class="btn btn-secondary">📁 Browse</button>
+                        </div>
+                        <small class="help-text">Click Browse to select a flag SVG file (must be in assets/Flags/ folder)</small>
+                    </div>
+                    <button id="addCountryBtn" class="btn btn-primary">Add Mapping</button>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Current Mappings</h3>
+                    <div id="countryMappingsList" class="mappings-list">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Include JSZip for bulk downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- Include FileSaver for downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Include SheetJS for XLSX parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Include Supabase client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Include jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- svg2pdf CDN removed (was causing net::ERR_NAME_NOT_RESOLVED). -->
+    <!-- If svg2pdf functionality is required, add a local copy or a working CDN link. -->
+    <script src="js/app.js"></script>
+</body>
+</html>
