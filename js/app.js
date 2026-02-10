@@ -1488,6 +1488,19 @@ class QRGenerator {
             const membership = row.membershipInfo || {};
             const vehicle = row.vehicleDetails || {};
             
+            // Check if member is a trainee (not permanent) - skip trainees
+            const membershipNumber = membership.membershipNumber || row.membershipNumber || '';
+            const rank = membership.rank || row.rank || '';
+            
+            if (membershipNumber.toLowerCase().includes('trainee') || rank.toLowerCase().includes('trainee')) {
+                skippedRecords.push({ 
+                    row: index + 1, 
+                    name: personal.name || row.name || 'Unknown',
+                    reason: 'Trainee status (not permanent member)' 
+                });
+                return; // Skip this record
+            }
+            
             // Combine name and surname from personalInfo
             const fullName = personal.name && personal.surname 
                 ? `${personal.name} ${personal.surname}`.trim() 
