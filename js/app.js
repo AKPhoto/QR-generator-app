@@ -73,9 +73,9 @@ class QRGenerator {
         }
         
         try {
-            const response = await fetch(`assets/Flags/${flagFilename}`);
+            const response = await fetch(`/assets/Flags/${flagFilename}`);
             if (!response.ok) {
-                console.error(`Flag file not found: assets/Flags/${flagFilename}`);
+                console.error(`Flag file not found: /assets/Flags/${flagFilename}`);
                 return null;
             }
             const svgContent = await response.text();
