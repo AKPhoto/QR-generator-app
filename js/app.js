@@ -339,6 +339,16 @@ class QRGenerator {
 
         // Name field now contains full name (first and last)
         const fullName = formData.name;
+
+        // Prevent badge generation if photo is missing or invalid field values exist
+        const invalidBadgeField = Object.entries(formData).find(([key, value]) =>
+            value && value.includes("'.")
+        );
+
+        if ((type === 'badge' || type === 'both') && (!photoDataUrl || invalidBadgeField)) {
+            alert('Sorry I can\'t generate the badge because either the photo or information is missing.');
+            return;
+        }
         
         // Fields 1-10 for badge QR code (personal, emergency, medical info)
         const qrCodeData = {
@@ -1720,6 +1730,7 @@ class QRGenerator {
         previewGrid.innerHTML = '';
         
         this.qrDataCache = [];
+        let skippedBadgeCount = 0;  // Counter for skipped badges
 
         // Generate badges/discs for each row
         for (let i = 0; i < this.bulkData.length; i++) {
@@ -1845,31 +1856,34 @@ class QRGenerator {
                 console.log(`Country for ${fullName}: (empty or not provided)`);
             }
 
-            // Check if should skip this badge
+            // Check if should skip badge generation
             let skipBadge = false;
-            if (!photoDataUrl) {
-                console.log(`Skipping badge for ${fullName} - photo missing`);
-                skipBadge = true;
-            }
-            // Check fields for "'."
-            for (const key in row) {
-                const value = row[key];
-                if (value && typeof value === 'string' && value.includes("'.") ) {
-                    console.log(`Skipping badge for ${fullName} - field ${key} contains "'.": ${value}`);
+            if (type === 'badge' || type === 'both') {
+                if (!photoDataUrl) {
+                    console.log(`Skipping badge for ${fullName} - photo missing`);
                     skipBadge = true;
-                    break;
                 }
-            }
-            if (skipBadge) {
-                console.log(`Badge skipped for ${fullName}`);
-                continue; // Skip to next row
+                // Check fields for "'."
+                if (!skipBadge) {
+                    for (const key in row) {
+                        const value = row[key];
+                        if (value && typeof value === 'string' && value.includes("'.") ) {
+                            console.log(`Skipping badge for ${fullName} - field ${key} contains "'.": ${value}`);
+                            skipBadge = true;
+                            break;
+                        }
+                    }
+                }
+                if (skipBadge) {
+                    skippedBadgeCount++;
+                }
             }
 
             // Generate based on type
             try {
                 // Use plain-text payloads for bulk items (open in memo/text apps)
 
-                if (type === 'badge' || type === 'both') {
+                if ((type === 'badge' || type === 'both') && !skipBadge) {
                     await this.createBulkBadge(fullName, badgeQrDataStr, null, previewGrid, badgeDisplayInfo, i, photoDataUrl, country);
                 }
 
@@ -1892,6 +1906,11 @@ class QRGenerator {
         }
         
         console.log(`Completed generation. Total items in cache: ${this.qrDataCache.length}`);
+        
+        // Show skipped badges message if any were skipped
+        if (skippedBadgeCount > 0) {
+            alert(`Could not generate ${skippedBadgeCount} badge${skippedBadgeCount > 1 ? 's' : ''} because either the photo or information is missing.`);
+        }
 
         // Show preview
         document.getElementById('bulkPreview').style.display = 'block';
