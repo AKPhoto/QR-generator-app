@@ -1856,6 +1856,9 @@ class QRGenerator {
                 console.log(`Country for ${fullName}: (empty or not provided)`);
             }
 
+            // DEBUG: Log before skip check
+            console.log(`DEBUG: About to check skip - type: "${type}", photoDataUrl: ${photoDataUrl ? 'HAS VALUE' : 'NULL/EMPTY'}, fullName: ${fullName}`);
+
             // Check if should skip badge generation
             let skipBadge = false;
             if (type === 'badge' || type === 'both') {
