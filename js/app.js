@@ -28,6 +28,19 @@ class QRGenerator {
         const noResponses = ['none', 'n/a', 'no allergies', 'no conditions', 'no allergy', 'no condition'];
         return !noResponses.includes(trimmed);
     }
+
+    normalizeBoolean(value) {
+        if (value === true || value === false) return value;
+        if (typeof value === 'string') {
+            const trimmed = value.trim().toLowerCase();
+            if (trimmed === 'true' || trimmed === '1' || trimmed === 'yes') return true;
+            if (trimmed === 'false' || trimmed === '0' || trimmed === 'no' || trimmed === '') return false;
+        }
+        if (typeof value === 'number') {
+            return value === 1;
+        }
+        return Boolean(value);
+    }
     
     async loadTemplates() {
         try {
@@ -634,6 +647,11 @@ class QRGenerator {
         
         console.log('Creating badge for:', name, 'Country:', country);
         console.log('Photo data URL provided:', photoDataUrl ? 'YES (length: ' + photoDataUrl.length + ')' : 'NO');
+
+        if (!photoDataUrl) {
+            console.warn(`Badge render aborted for ${name} because no photo data URL was available`);
+            return null;
+        }
         
         // Create a parser to work with the SVG
         const parser = new DOMParser();
@@ -1543,7 +1561,7 @@ class QRGenerator {
                 country: personal.country || row.country || '', // For flag mapping
                 
                 // Photo info from Supabase: use member ID as filename if has_photo is true
-                hasPhoto: row.has_photo || false,
+                hasPhoto: this.normalizeBoolean(row.has_photo),
                 photoId: row.id || null, // Member UUID used as photo filename in Storage
                 
                 // Disc QR fields (vehicle info)
@@ -1932,6 +1950,11 @@ class QRGenerator {
     async createBulkBadge(name, data, qrSize, container, displayInfo, index, photoDataUrl = null, country = null) {
         console.log(`\n=== Starting Badge Generation for ${name} ===`);
         console.log('Step 1: Generate QR code as PNG');
+
+        if (!photoDataUrl) {
+            console.warn(`Skipping badge render for ${name} because no photo was resolved`);
+            return;
+        }
         
         // Generate badge using the same logic as individual mode
         const tempContainer = document.createElement('div');
