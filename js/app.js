@@ -1845,6 +1845,26 @@ class QRGenerator {
                 console.log(`Country for ${fullName}: (empty or not provided)`);
             }
 
+            // Check if should skip this badge
+            let skipBadge = false;
+            if (!photoDataUrl) {
+                console.log(`Skipping badge for ${fullName} - photo missing`);
+                skipBadge = true;
+            }
+            // Check fields for "'."
+            for (const key in row) {
+                const value = row[key];
+                if (value && typeof value === 'string' && value.includes("'.") ) {
+                    console.log(`Skipping badge for ${fullName} - field ${key} contains "'.": ${value}`);
+                    skipBadge = true;
+                    break;
+                }
+            }
+            if (skipBadge) {
+                console.log(`Badge skipped for ${fullName}`);
+                continue; // Skip to next row
+            }
+
             // Generate based on type
             try {
                 // Use plain-text payloads for bulk items (open in memo/text apps)
