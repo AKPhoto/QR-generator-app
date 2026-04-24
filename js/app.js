@@ -1857,7 +1857,11 @@ class QRGenerator {
             }
 
             // DEBUG: Log before skip check
-            console.log(`DEBUG: About to check skip - type: "${type}", photoDataUrl: ${photoDataUrl ? 'HAS VALUE' : 'NULL/EMPTY'}, fullName: ${fullName}`);
+            const debugMsg = `SKIP_CHECK: type="${type}", hasPhoto=${!!photoDataUrl}, name=${fullName}`;
+            console.log(debugMsg);
+            if (fullName.includes('Martin')) {
+                console.warn('🔴 REACHED SKIP LOGIC FOR MARTIN POTGIETER');
+            }
 
             // Check if should skip badge generation
             let skipBadge = false;
